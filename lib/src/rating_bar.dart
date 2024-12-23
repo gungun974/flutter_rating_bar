@@ -56,6 +56,7 @@ class RatingBar extends StatefulWidget {
     this.tapOnlyMode = false,
     this.updateOnDrag = false,
     this.wrapAlignment = WrapAlignment.start,
+    this.behavior,
     super.key,
   })  : _itemBuilder = null,
         _ratingWidget = ratingWidget;
@@ -85,6 +86,7 @@ class RatingBar extends StatefulWidget {
     this.tapOnlyMode = false,
     this.updateOnDrag = false,
     this.wrapAlignment = WrapAlignment.start,
+    this.behavior,
     super.key,
   })  : _itemBuilder = itemBuilder,
         _ratingWidget = null;
@@ -200,6 +202,8 @@ class RatingBar extends StatefulWidget {
   final IndexedWidgetBuilder? _itemBuilder;
   final RatingWidget? _ratingWidget;
 
+  final HitTestBehavior? behavior;
+
   @override
   State<RatingBar> createState() => _RatingBarState();
 }
@@ -314,6 +318,7 @@ class _RatingBarState extends State<RatingBar> {
     return IgnorePointer(
       ignoring: widget.ignoreGestures,
       child: GestureDetector(
+        behavior: widget.behavior,
         onTapDown: (details) {
           double value;
           final tappedPosition = details.localPosition.dx;
