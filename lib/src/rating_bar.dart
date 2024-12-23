@@ -316,14 +316,10 @@ class _RatingBarState extends State<RatingBar> {
       child: GestureDetector(
         onTapDown: (details) {
           double value;
-          if (index == 0 && (_rating == 1 || _rating == 0.5)) {
-            value = 0;
-          } else {
-            final tappedPosition = details.localPosition.dx;
-            final tappedOnFirstHalf = tappedPosition <= widget.itemWidth / 2;
-            value = index +
-                (tappedOnFirstHalf && widget.allowHalfRating ? 0.5 : 1.0);
-          }
+          final tappedPosition = details.localPosition.dx;
+          final tappedOnFirstHalf = tappedPosition <= widget.itemWidth / 2;
+          value =
+              index + (tappedOnFirstHalf && widget.allowHalfRating ? 0.5 : 1.0);
 
           value = math.max(value, widget.minRating);
           widget.onRatingUpdate(value);
