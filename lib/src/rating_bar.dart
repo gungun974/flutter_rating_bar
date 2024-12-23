@@ -56,7 +56,6 @@ class RatingBar extends StatefulWidget {
     this.tapOnlyMode = false,
     this.updateOnDrag = false,
     this.wrapAlignment = WrapAlignment.start,
-    this.behavior,
     super.key,
   })  : _itemBuilder = null,
         _ratingWidget = ratingWidget;
@@ -86,7 +85,6 @@ class RatingBar extends StatefulWidget {
     this.tapOnlyMode = false,
     this.updateOnDrag = false,
     this.wrapAlignment = WrapAlignment.start,
-    this.behavior,
     super.key,
   })  : _itemBuilder = itemBuilder,
         _ratingWidget = null;
@@ -202,8 +200,6 @@ class RatingBar extends StatefulWidget {
   final IndexedWidgetBuilder? _itemBuilder;
   final RatingWidget? _ratingWidget;
 
-  final HitTestBehavior? behavior;
-
   @override
   State<RatingBar> createState() => _RatingBarState();
 }
@@ -317,9 +313,8 @@ class _RatingBarState extends State<RatingBar> {
 
     return IgnorePointer(
       ignoring: widget.ignoreGestures,
-      child: GestureDetector(
-        behavior: widget.behavior,
-        onTapDown: (details) {
+      child: Listener(
+        onPointerDown: (details) {
           double value;
           final tappedPosition = details.localPosition.dx;
           final tappedOnFirstHalf = tappedPosition <= widget.itemWidth / 2;
@@ -331,42 +326,44 @@ class _RatingBarState extends State<RatingBar> {
           _rating = value;
           setState(() {});
         },
-        onHorizontalDragStart: _isHorizontal ? _onDragStart : null,
-        onHorizontalDragEnd: _isHorizontal ? _onDragEnd : null,
-        onHorizontalDragUpdate: _isHorizontal ? _onDragUpdate : null,
-        onVerticalDragStart: _isHorizontal ? null : _onDragStart,
-        onVerticalDragEnd: _isHorizontal ? null : _onDragEnd,
-        onVerticalDragUpdate: _isHorizontal ? null : _onDragUpdate,
-        child: Padding(
-          padding: widget.itemPadding,
-          child: ValueListenableBuilder<bool>(
-            valueListenable: _glow,
-            builder: (context, glow, child) {
-              if (glow && widget.glow) {
-                final glowColor =
-                    widget.glowColor ?? Theme.of(context).colorScheme.secondary;
-                return DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: glowColor.withAlpha(30),
-                        blurRadius: 10,
-                        spreadRadius: widget.glowRadius,
-                      ),
-                      BoxShadow(
-                        color: glowColor.withAlpha(20),
-                        blurRadius: 10,
-                        spreadRadius: widget.glowRadius,
-                      ),
-                    ],
-                  ),
-                  child: child,
-                );
-              }
-              return child!;
-            },
-            child: resolvedRatingWidget,
+        child: GestureDetector(
+          onHorizontalDragStart: _isHorizontal ? _onDragStart : null,
+          onHorizontalDragEnd: _isHorizontal ? _onDragEnd : null,
+          onHorizontalDragUpdate: _isHorizontal ? _onDragUpdate : null,
+          onVerticalDragStart: _isHorizontal ? null : _onDragStart,
+          onVerticalDragEnd: _isHorizontal ? null : _onDragEnd,
+          onVerticalDragUpdate: _isHorizontal ? null : _onDragUpdate,
+          child: Padding(
+            padding: widget.itemPadding,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _glow,
+              builder: (context, glow, child) {
+                if (glow && widget.glow) {
+                  final glowColor = widget.glowColor ??
+                      Theme.of(context).colorScheme.secondary;
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: glowColor.withAlpha(30),
+                          blurRadius: 10,
+                          spreadRadius: widget.glowRadius,
+                        ),
+                        BoxShadow(
+                          color: glowColor.withAlpha(20),
+                          blurRadius: 10,
+                          spreadRadius: widget.glowRadius,
+                        ),
+                      ],
+                    ),
+                    child: child,
+                  );
+                }
+                return child!;
+              },
+              child: resolvedRatingWidget,
+            ),
           ),
         ),
       ),
