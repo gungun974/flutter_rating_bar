@@ -50,7 +50,8 @@ class RatingBar extends StatefulWidget {
     this.initialRating = 0.0,
     this.itemCount = 5,
     this.itemPadding = EdgeInsets.zero,
-    this.itemSize = 40.0,
+    this.itemHeight = 40.0,
+    this.itemWidth = 40.0,
     this.minRating = 0,
     this.tapOnlyMode = false,
     this.updateOnDrag = false,
@@ -78,7 +79,8 @@ class RatingBar extends StatefulWidget {
     this.initialRating = 0.0,
     this.itemCount = 5,
     this.itemPadding = EdgeInsets.zero,
-    this.itemSize = 40.0,
+    this.itemHeight = 40.0,
+    this.itemWidth = 40.0,
     this.minRating = 0,
     this.tapOnlyMode = false,
     this.updateOnDrag = false,
@@ -156,12 +158,19 @@ class RatingBar extends StatefulWidget {
   /// {@endtemplate}
   final EdgeInsetsGeometry itemPadding;
 
-  /// {@template flutterRatingBar.itemSize}
+  /// {@template flutterRatingBar.itemHeight}
   /// Defines width and height of each rating item in the bar.
   ///
   /// Default is 40.0
   /// {@endtemplate}
-  final double itemSize;
+  final double itemHeight;
+
+  /// {@template flutterRatingBar.itemWidth}
+  /// Defines width and height of each rating item in the bar.
+  ///
+  /// Default is 40.0
+  /// {@endtemplate}
+  final double itemWidth;
 
   /// Sets minimum rating
   ///
@@ -258,7 +267,8 @@ class _RatingBarState extends State<RatingBar> {
 
     if (index >= _rating) {
       resolvedRatingWidget = _NoRatingWidget(
-        size: widget.itemSize,
+        height: widget.itemHeight,
+        width: widget.itemWidth,
         enableMask: ratingWidget == null,
         unratedColor: widget.unratedColor ?? Theme.of(context).disabledColor,
         child: ratingWidget?.empty ?? item!,
@@ -266,7 +276,8 @@ class _RatingBarState extends State<RatingBar> {
     } else if (index >= _rating - ratingOffset && widget.allowHalfRating) {
       if (ratingWidget?.half == null) {
         resolvedRatingWidget = _HalfRatingWidget(
-          size: widget.itemSize,
+          height: widget.itemHeight,
+          width: widget.itemWidth,
           enableMask: ratingWidget == null,
           rtlMode: _isRTL,
           unratedColor: widget.unratedColor ?? Theme.of(context).disabledColor,
@@ -274,8 +285,8 @@ class _RatingBarState extends State<RatingBar> {
         );
       } else {
         resolvedRatingWidget = SizedBox(
-          width: widget.itemSize,
-          height: widget.itemSize,
+          width: widget.itemWidth,
+          height: widget.itemHeight,
           child: FittedBox(
             child: _isRTL
                 ? Transform(
@@ -291,8 +302,8 @@ class _RatingBarState extends State<RatingBar> {
       iconRating += 0.5;
     } else {
       resolvedRatingWidget = SizedBox(
-        width: widget.itemSize,
-        height: widget.itemSize,
+        width: widget.itemWidth,
+        height: widget.itemHeight,
         child: FittedBox(
           child: ratingWidget?.full ?? item,
         ),
@@ -309,7 +320,7 @@ class _RatingBarState extends State<RatingBar> {
             value = 0;
           } else {
             final tappedPosition = details.localPosition.dx;
-            final tappedOnFirstHalf = tappedPosition <= widget.itemSize / 2;
+            final tappedOnFirstHalf = tappedPosition <= widget.itemWidth / 2;
             value = index +
                 (tappedOnFirstHalf && widget.allowHalfRating ? 0.5 : 1.0);
           }
@@ -371,9 +382,9 @@ class _RatingBarState extends State<RatingBar> {
       final pos = box.globalToLocal(dragDetails.globalPosition);
       double i;
       if (widget.direction == Axis.horizontal) {
-        i = pos.dx / (widget.itemSize + widget.itemPadding.horizontal);
+        i = pos.dx / (widget.itemWidth + widget.itemPadding.horizontal);
       } else {
-        i = pos.dy / (widget.itemSize + widget.itemPadding.vertical);
+        i = pos.dy / (widget.itemHeight + widget.itemPadding.vertical);
       }
       var currentRating = widget.allowHalfRating ? i : i.round().toDouble();
       if (currentRating > widget.itemCount) {
@@ -405,7 +416,8 @@ class _RatingBarState extends State<RatingBar> {
 
 class _HalfRatingWidget extends StatelessWidget {
   const _HalfRatingWidget({
-    required this.size,
+    required this.height,
+    required this.width,
     required this.child,
     required this.enableMask,
     required this.rtlMode,
@@ -413,7 +425,8 @@ class _HalfRatingWidget extends StatelessWidget {
   });
 
   final Widget child;
-  final double size;
+  final double height;
+  final double width;
   final bool enableMask;
   final bool rtlMode;
   final Color unratedColor;
@@ -421,15 +434,16 @@ class _HalfRatingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: size,
-      width: size,
+      height: height,
+      width: width,
       child: enableMask
           ? Stack(
               fit: StackFit.expand,
               children: [
                 FittedBox(
                   child: _NoRatingWidget(
-                    size: size,
+                    height: height,
+                    width: width,
                     unratedColor: unratedColor,
                     enableMask: enableMask,
                     child: child,
@@ -478,13 +492,15 @@ class _HalfClipper extends CustomClipper<Rect> {
 
 class _NoRatingWidget extends StatelessWidget {
   const _NoRatingWidget({
-    required this.size,
+    required this.height,
+    required this.width,
     required this.child,
     required this.enableMask,
     required this.unratedColor,
   });
 
-  final double size;
+  final double height;
+  final double width;
   final Widget child;
   final bool enableMask;
   final Color unratedColor;
@@ -492,8 +508,8 @@ class _NoRatingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: size,
-      width: size,
+      height: height,
+      width: width,
       child: FittedBox(
         child: enableMask
             ? ColorFiltered(
